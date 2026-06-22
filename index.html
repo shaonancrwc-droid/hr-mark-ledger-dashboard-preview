@@ -1,0 +1,969 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HR全景看板 · 玫瑰金</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.32.0/dist/tabler-icons.min.css" rel="stylesheet">
+<style>
+
+
+:root{
+  --font:'Inter','PingFang SC','Noto Sans SC',system-ui,sans-serif;
+  --bg:#FCFAFF;--bg2:#F8F5FF;--bg3:#F0ECFE;--card:#FFF;--card2:#FCFAFF;--card3:#F5F0FF;
+  --bd:rgba(124,58,237,0.08);--bd2:rgba(124,58,237,0.2);
+  --text:#0F0A1A;--text2:#2D2640;--text3:#6B6290;--text4:#9C94B8;
+  --glow:0 0 24px rgba(124,58,237,.1);
+  --glow2:0 2px 8px rgba(0,0,0,.03),0 8px 32px rgba(124,58,237,.06);
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:20px;--rf:999px;
+  --th:56px;--sbw:220px;--dw:380px;
+  --pri:#7C3AED; --pri-l:rgba(124,58,237,.1); --pri-g:rgba(124,58,237,.2);
+  --grn:#0EA57A; --grn-l:rgba(14,165,122,.1); --grn-g:rgba(14,165,122,.2);
+  --pnk:#E04D8B; --pnk-l:rgba(224,77,139,.1); --pnk-g:rgba(224,77,139,.2);
+  --gld:#D4932B; --gld-l:rgba(212,147,43,.1); --gld-g:rgba(212,147,43,.2);
+  --blu:#3B7DD8; --blu-l:rgba(59,125,216,.1); --blu-g:rgba(59,125,216,.2);
+  --cor:#D4686A; --cor-l:rgba(212,104,106,.1); --cor-g:rgba(212,104,106,.2);
+  --err:#DC5B4A; --err-bg:#FEF4F2;
+  --warn:#D4932B; --warn-bg:#FEFAF0;
+  --info:#3B7DD8; --info-bg:#F2F6FE;
+  --ok:#0EA57A; --ok-bg:#F0F9F5;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:var(--font);cursor:pointer}
+input{font-family:var(--font)}table{border-collapse:collapse;width:100%}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:0}
+
+/* ── Topbar ── */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--th);background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 24px;gap:12px}
+.topbar-logo{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text);letter-spacing:1px;text-transform:uppercase;flex-shrink:0}
+.logo-icon{width:28px;height:28px;background:var(--pri);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:800;box-shadow:0 0 12px var(--pri-g)}
+.topbar-dv{width:1px;height:18px;background:var(--bd);flex-shrink:0}
+.topbar-period{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3)}
+.topbar-period strong{color:var(--text2);font-weight:600}
+.topbar-badge{font-size:10px;font-weight:700;padding:2px 8px;background:var(--pri-l);color:var(--pri);border:1px solid var(--pri-g);text-transform:uppercase;letter-spacing:1px}
+.topbar-actions{margin-left:auto;display:flex;align-items:center;gap:6px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 16px!important;font-size:12px;font-weight:500;border:1px solid var(--bd);background:var(--card);color:var(--text3);transition:all .15s;line-height:1;letter-spacing:.3px}
+.btn:hover{border-color:var(--bd2);background:var(--card2);color:var(--text)}
+.btn-pri{background:var(--pri);color:#fff;border-color:var(--pri)}
+.btn-pri:hover{background:#6D78E0;border-color:#6D78E0}
+.btn-gh{border-color:transparent;background:transparent}.btn-gh:hover{background:var(--card)}
+.alert-dot{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%!important;background:var(--err)}.btn-ad{position:relative}
+
+/* ── Sidebar ── */
+.sidebar{position:fixed;top:var(--th);left:0;bottom:0;width:var(--sbw);z-index:99;background:var(--bg2);border-right:1px solid var(--bd);overflow-y:auto;padding:20px 14px;display:flex;flex-direction:column;gap:2px;transition:width .25s}
+.sidebar-sec{font-size:9px;font-weight:600;color:var(--text4);text-transform:uppercase;letter-spacing:2.5px;padding:16px 12px 8px;display:flex;align-items:center;justify-content:space-between}
+.s-collapse-btn{font-size:9px;cursor:pointer;color:var(--text4);padding:2px 4px;transition:all .15s}
+.s-collapse-btn:hover{color:var(--pri)}
+.sidebar.collapsed{width:52px!important}
+.sidebar.collapsed .sidebar-sec{justify-content:center;padding:16px 0 8px}
+.sidebar.collapsed .s-collapse-btn{transform:rotate(180deg)}
+.sidebar.collapsed .si-count,
+.sidebar.collapsed .s-item span:not(.si-ico),
+.sidebar.collapsed .sidebar-sec span:not(.s-collapse-btn),
+.sidebar.collapsed .s-item.info{display:none}
+.sidebar.collapsed .s-item{justify-content:center;padding:9px}
+.sidebar.collapsed .sidebar-end{padding-top:0}
+.s-item{display:flex;align-items:center;gap:12px;padding:9px 12px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;transition:all .15s;border:1px solid transparent}
+.s-item:hover{color:var(--text2);background:var(--card)}
+.s-item.active{background:var(--card);color:var(--text);border-color:var(--bd2);font-weight:600;box-shadow:0 0 12px var(--pri-g)}
+.s-item .si-ico{font-size:14px;width:20px;text-align:center;flex-shrink:0}
+.s-item .si-count{font-size:9px;font-weight:600;padding:2px 6px;background:var(--card3);color:var(--text4);margin-left:auto}
+.s-item.active .si-count{background:var(--pri-l);color:var(--pri)}
+.s-item .si-dot{width:8px;height:8px;border-radius:50%!important;flex-shrink:0;box-shadow:0 0 6px currentColor}
+.sidebar-end{flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding-top:16px}
+.s-item.info{font-size:11px;color:var(--text4);font-weight:400;cursor:default}
+.s-item.info:hover{background:transparent}
+
+/* ── Main ── */
+.main{margin-top:var(--th);margin-left:var(--sbw);padding:20px;transition:margin-left .25s,margin-right .3s}.main.dopen{margin-right:var(--dw)}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.st{font-size:10px;font-weight:600;color:var(--text4);text-transform:uppercase;letter-spacing:2.5px}
+
+/* ── KPI Big ── */
+.kpi-g{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.kpi-c{background:var(--card);padding:14px 10px;box-shadow:0 1px 3px rgba(0,0,0,.04);border:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transition:all .2s}
+.kpi-c:hover{box-shadow:0 4px 16px rgba(124,58,237,.08);border-color:var(--pri);transform:translateY(-2px)}
+.kpi-tr{font-size:9px;font-weight:600;padding:2px 7px;margin-top:5px;display:inline-block;text-transform:uppercase;letter-spacing:.5px}
+.kpi-tr.up{background:var(--ok-bg);color:var(--ok)}.kpi-tr.dn{background:var(--err-bg);color:var(--err)}.kpi-tr.fl{background:var(--bg3);color:var(--text3)}
+.kpi-v{font-size:22px;font-weight:800;line-height:1;color:var(--text);letter-spacing:-.3px;text-align:center}
+.kpi-u{font-size:11px;font-weight:600;color:var(--text4);margin-left:1px}
+.kpi-l{font-size:11px;color:var(--text2);margin-top:3px;font-weight:600;text-align:center}
+
+/* ── KPI Groups ── */
+.kpi-sg{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.kg{background:var(--card);border:1px solid var(--bd);padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.kg-h{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.3px}
+.kg-dot{width:6px;height:6px;border-radius:50%!important;flex-shrink:0}
+.kg-cards{display:grid;gap:6px}
+.kg-cards.c4{grid-template-columns:repeat(4,1fr)}.kg-cards.c5{grid-template-columns:repeat(5,1fr)}.kg-cards.c2{grid-template-columns:repeat(2,1fr)}
+.kg-item{background:var(--bg2);padding:8px 10px;display:flex;align-items:center;gap:8px;border:1px solid var(--bd)}
+.kg-item-info{flex:1;min-width:0}
+.kg-item-label{font-size:10px;color:var(--text4);margin-bottom:1px;font-weight:500}
+.kg-item-val{font-size:14px;font-weight:800;color:var(--text);line-height:1.2;letter-spacing:-.2px}
+.kg-item-val .u{font-size:9px;font-weight:500;color:var(--text4);margin-left:1px}
+.kg-item-sub{font-size:9px;color:var(--text4);margin-top:1px}
+
+/* ── Chart Section ── */
+.chart-sec{background:var(--card);border:1px solid var(--bd);margin-bottom:16px;overflow:hidden;box-shadow:var(--glow2);transition:box-shadow .2s}
+.chart-sh{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0}
+.chart-sh-t{font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:1.5px}
+.chart-tabs{display:flex;gap:6px;padding:16px 24px;border-bottom:1px solid var(--bd)}
+.ctab{font-size:10px;font-weight:600;color:var(--text4);padding:6px 14px;cursor:pointer;transition:all .15s;border:1px solid transparent;text-transform:uppercase;letter-spacing:1.2px}
+.ctab:hover{color:var(--text2);background:var(--bg3)}
+.ctab.active{color:var(--pri);background:var(--pri-l);font-weight:600;border-color:var(--pri-g)}
+.chart-g{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:24px}
+.ci-l{font-size:9px;font-weight:600;color:var(--text4);margin-bottom:8px;display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:1.2px}
+.ci-t{font-size:8px;font-weight:700;padding:2px 5px;background:var(--bg3);color:var(--text4)}
+.cw{height:155px;position:relative}.ce{height:155px;display:flex;align-items:center;justify-content:center;color:var(--text4);font-size:12px}
+
+/* ── Accordion ── */
+.det-sec{background:var(--card);border:1px solid var(--bd);margin-bottom:16px;overflow:hidden;box-shadow:var(--glow2)}
+.ai{border-bottom:1px solid var(--bd)}.ai:last-child{border-bottom:none}
+.ah{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;cursor:pointer;user-select:none;transition:all .15s}.ah:hover{background:var(--bg3)}
+.ah-l{display:flex;align-items:center;gap:12px}.ad{width:8px;height:8px;border-radius:50%!important;flex-shrink:0;box-shadow:0 0 6px currentColor}
+.at{font-size:13px;font-weight:500;color:var(--text);letter-spacing:.5px}
+.ac{font-size:9px;font-weight:600;padding:2px 7px;background:var(--bg3);color:var(--text3)}
+.aarrow{font-size:9px;color:var(--text4);transition:transform .15s;display:inline-block}.aarrow.open{transform:rotate(90deg)}
+.ab{display:none;padding:0 24px 20px}.ab.open{display:block}
+.dtg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.dc{background:var(--bg3);padding:12px;border:1px solid var(--bd)}
+.dc-t{font-size:10px;font-weight:700;color:var(--text2);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:1px}
+table.dt{font-size:11px;color:var(--text2)}
+table.dt th{background:var(--bg2);padding:6px 10px;color:var(--text3);font-weight:600;font-size:10px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap;text-transform:uppercase;letter-spacing:.8px}
+table.dt td{padding:5px 8px;color:var(--text2);border-bottom:1px solid var(--bd);font-size:11px}
+table.dt tr:nth-child(even) td{background:rgba(0,0,0,.12)}
+table.dt tr:last-child td{border-bottom:none}table.dt tr:hover td{background:var(--bg3)}
+
+/* ── Alerts ── */
+.ab-g{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.abc{padding:20px;border:1px solid;position:relative;box-shadow:var(--glow2)}
+.abc.red{background:var(--err-bg);border-color:rgba(239,68,68,.2)}
+.abc.yellow{background:var(--warn-bg);border-color:rgba(245,158,11,.2)}
+.abc.blue{background:var(--info-bg);border-color:rgba(56,189,248,.2)}
+.abc.green{background:var(--ok-bg);border-color:rgba(16,185,129,.2)}
+.abc-pri{position:absolute;top:10px;right:12px;font-size:8px;font-weight:700;padding:2px 6px;background:rgba(0,0,0,.3);text-transform:uppercase;letter-spacing:.5px}
+.abc-pri.r{color:var(--err)}.abc-pri.y{color:var(--warn)}.abc-pri.b{color:var(--info)}.abc-pri.g{color:var(--ok)}
+.abc-i{font-size:16px;margin-bottom:6px}.abc-t{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.abc-d{font-size:12px;color:var(--text3);line-height:1.6}
+.abc-l{margin-top:6px;font-size:10px;color:var(--text4);list-style:none;line-height:1.8}
+.abc-l li::before{content:'→ ';margin-right:3px;color:var(--text4);opacity:.5}
+
+/* ── Actions ── */
+.act-g{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
+.actc{background:var(--card);padding:20px 22px;border:1px solid var(--bd);box-shadow:var(--glow2)}
+.act-tag{font-size:9px;font-weight:700;padding:2px 7px;margin-bottom:6px;display:inline-block;background:var(--pri-l);color:var(--pri);text-transform:uppercase;letter-spacing:.5px}
+.act-t{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;letter-spacing:.3px}
+.act-d{font-size:12px;color:var(--text3);line-height:1.6}
+
+/* ── Footnote ── */
+.fn{font-size:10px;color:var(--text4);line-height:1.8;padding:16px 24px;background:var(--card);border:1px solid var(--bd);box-shadow:var(--glow2);margin-bottom:32px}.fn b{color:var(--text3)}
+
+/* ── Module Page ── */
+.mp-sec{background:var(--card);border:1px solid var(--bd);margin-bottom:16px;padding:24px;box-shadow:var(--glow2)}
+.mp-sec h3{font-size:12px;font-weight:600;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:1.5px}
+.mp-sec h3 .md{width:8px;height:8px;border-radius:50%!important;flex-shrink:0;box-shadow:0 0 8px currentColor}
+.mp-kpi-g{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.mp-kpi-c{text-align:center;padding:14px 10px;background:var(--bg3);border:1px solid var(--bd)}
+.mp-kpi-c .v{font-size:22px;font-weight:700;color:var(--text);line-height:1.2}
+.mp-kpi-c .v .u{font-size:10px;font-weight:500;color:var(--text4)}
+.mp-kpi-c .l{font-size:10px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.8px}
+.mp-chart-g{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.mp-chart-g .cw{height:170px;position:relative}
+.mp-data-g{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.mp-analysis{font-size:13px;color:var(--text2);line-height:1.9;padding:0 4px}
+.mp-analysis li{margin-bottom:4px;list-style:none}
+.mp-analysis li::before{content:'→ ';color:var(--pri);opacity:.7}
+
+/* ── Drawer ── */
+.dov{position:fixed;inset:0;z-index:199;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .3s}.dov.open{opacity:1;pointer-events:auto}
+.dr{position:fixed;top:0;right:calc(-1 * var(--dw));bottom:0;width:var(--dw);z-index:200;background:var(--bg2);border-left:1px solid var(--bd);box-shadow:-4px 0 32px rgba(0,0,0,.3);display:flex;flex-direction:column;transition:right .3s}.dr.open{right:0}
+.dr-h{padding:20px 20px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.dr-ti{font-size:13px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:1.5px}
+.dr-x{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;transition:all .15s}.dr-x:hover{background:var(--card);color:var(--text)}
+.dr-pr{padding:16px 20px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.dr-pl{font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px}
+.dr-pb{display:flex;flex-wrap:wrap;gap:6px}
+.dr-pbtn{font-size:11px;font-weight:500;padding:4px 12px;border:1px solid var(--bd);background:var(--card);color:var(--text3);cursor:pointer;transition:all .15s}
+.dr-pbtn:hover,.dr-pbtn.active{background:var(--pri);color:#fff;border-color:var(--pri)}
+.dr-b{flex:1;overflow-y:auto;padding:16px 20px}
+.dr-m{margin-bottom:14px}.dr-mh{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:8px;cursor:pointer;transition:all .15s}.dr-mh:hover{background:var(--card)}
+.dr-md{width:10px;height:10px;border-radius:50%!important;flex-shrink:0;box-shadow:0 0 8px currentColor}
+.dr-ml{font-size:12px;font-weight:700;color:var(--text);flex:1;text-transform:uppercase;letter-spacing:.5px}.dr-mc{font-size:9px;color:var(--text4)}
+.dr-mi{display:flex;flex-direction:column;gap:2px}
+.dr-mitem{display:flex;align-items:flex-start;gap:8px;padding:6px 8px;cursor:pointer;transition:all .15s}.dr-mitem:hover{background:var(--card)}
+.dr-mitem input[type=checkbox]{margin-top:2px;width:14px;height:14px;accent-color:var(--pri);cursor:pointer;flex-shrink:0}
+.dr-mlb{font-size:11px;font-weight:500;color:var(--text2);line-height:1.4}.dr-mn{font-size:9px;color:var(--text4);margin-top:1px}
+.dr-f{padding:14px 20px;border-top:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.dr-sc{font-size:11px;color:var(--text3)}.dr-sc b{color:var(--pri);font-weight:700}.dr-fb{display:flex;gap:8px}
+
+/* ── Healing Elements ── */
+.greeting{background:var(--card);border:1px solid var(--bd);padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.greeting-icon{font-size:24px;flex-shrink:0}
+.greeting h2{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+.greeting p{font-size:12px;color:var(--text3);line-height:1.5}
+.highlight{background:var(--card);border:1px solid var(--bd);padding:14px 18px;margin-bottom:14px}
+.highlight h3{font-size:10px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px;letter-spacing:.5px}
+.hl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.hl-item{background:var(--bg2);border-radius:var(--r-md);padding:10px 12px;border:1px solid var(--bd);text-align:center}
+.hl-num{font-size:18px;font-weight:800;color:var(--text);line-height:1.2;letter-spacing:-.2px}
+.hl-num.grn{color:var(--grn)}.hl-num.gld{color:var(--gld)}
+.hl-label{font-size:10px;color:var(--text2);margin-top:2px;font-weight:600}
+.hl-desc{font-size:9px;color:var(--text4);margin-top:1px}
+.hl-summary{margin-top:8px;font-size:12px;color:var(--text2);line-height:1.6}
+.focus-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.focus-item{background:var(--card);border:1px solid var(--bd);padding:12px 14px;text-align:center}
+.focus-num{font-size:22px;font-weight:800;color:var(--text);line-height:1.2;letter-spacing:-.3px}
+.focus-num.grn{color:var(--grn)}
+.focus-label{font-size:11px;color:var(--text2);margin-top:2px;font-weight:600}
+.focus-tag{font-size:9px;font-weight:600;padding:2px 7px;margin-top:6px;display:inline-block;letter-spacing:.3px}
+.focus-tag.warn{background:var(--warn-bg);color:var(--warn)}
+.focus-tag.good{background:var(--ok-bg);color:var(--ok)}
+.expand-bar{text-align:center;margin-bottom:14px;cursor:pointer;padding:8px;background:var(--card);border:1px dashed var(--bd);transition:all .2s}
+.expand-bar:hover{background:var(--bg2);border-color:var(--pri)}
+.expand-btn{font-size:12px;font-weight:600;color:var(--pri)}
+.abc-pri{position:absolute;top:10px;right:12px;font-size:8px;font-weight:600;padding:2px 8px;background:rgba(0,0,0,.03);text-transform:uppercase;letter-spacing:.5px}
+.abc-pri.cr{color:var(--cor)}.abc-pri.yl{color:var(--gld)}.abc-pri.bl{color:var(--blu)}.abc-pri.gr{color:var(--grn)}
+
+@media(max-width:1200px){.kg-cards.c4,.kg-cards.c5{grid-template-columns:repeat(3,1fr)}.chart-g,.dtg,.ab-g{grid-template-columns:repeat(2,1fr)}.act-g{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.kpi-g{grid-template-columns:repeat(3,1fr)}.main.dopen{margin-right:0}.dr{width:100vw;right:-100vw}}
+@media print{.topbar,.sidebar,.dr,.dov,.det-sec{display:none!important}.main{margin:0;padding:16px;background:#fff!important}.main.dopen{margin-right:0}.kpi-c,.kg,.chart-sec,.det-sec,.actc,.abc,.fn,.mp-sec{background:#fff!important;border-color:#ddd!important;color:#333!important}.kpi-v,.kpi-l,.kg-item-val,.at,.abc-t,.act-t,.mp-sec h3{color:#333!important}}
+</style>
+</head>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-logo"><div class="logo-icon">✦</div>HR全景看板</div>
+  <div class="topbar-dv"></div>
+  <div class="topbar-period"><strong>2026年6月</strong> <span style="color:var(--bd2)">·</span> 在职 <strong>31</strong> 人 <span style="color:var(--bd2)">·</span> 数据截止 <strong>2026-06-01</strong></div>
+  <div class="topbar-actions">
+    <button class="btn btn-gh btn-ad" onclick="toggleDrawer()">指标配置<span class="alert-dot"></span></button>
+    <button class="btn" onclick="window.print()">打印/PDF</button>
+    <button class="btn btn-pri" onclick="copyData()">复制数据</button>
+  </div>
+</header>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-sec">导航 <span class="s-collapse-btn" onclick="toggleSidebar()" title="收缩侧栏">◀</span></div>
+  <div class="s-item active" onclick="clickTab('all',this)"><span class="si-ico" style="color:var(--pri)">✦</span><span>全部概览</span><span class="si-count">62</span></div>
+  <div class="s-item" onclick="clickTab('ppl',this)"><span class="si-dot" style="background:var(--pri)"></span><span>人员结构</span><span class="si-count">17</span></div>
+  <div class="s-item" onclick="clickTab('flow',this)"><span class="si-dot" style="background:var(--grn)"></span><span>人员流动</span><span class="si-count">15</span></div>
+  <div class="s-item" onclick="clickTab('perf',this)"><span class="si-dot" style="background:var(--pnk)"></span><span>绩效管理</span><span class="si-count">8</span></div>
+  <div class="s-item" onclick="clickTab('sal',this)"><span class="si-dot" style="background:var(--gld)"></span><span>薪酬总览</span><span class="si-count">17</span></div>
+  <div class="s-item" onclick="clickTab('cntr',this)"><span class="si-dot" style="background:var(--blu)"></span><span>合同管理</span><span class="si-count">5</span></div>
+  <div class="s-item" onclick="clickTab('tne',this)"><span class="si-dot" style="background:var(--cor)"></span><span>司龄分析</span><span class="si-count">5</span></div>
+  <div class="sidebar-end">
+    <div class="sidebar-sec">信息</div>
+    <div class="s-item info"><span>报告: 2026年6月</span></div>
+    <div class="s-item info"><span>在职: 31人</span></div>
+  </div>
+</aside>
+
+<main class="main" id="main">
+<div id="overviewPage">
+
+  <div class="greeting">
+    <div class="greeting-icon">🌱</div>
+    <div>
+      <h2>早上好，今天有 <strong>31</strong> 位伙伴和你一起奋斗</h2>
+      <p>本月 <strong>3</strong> 位新朋友加入团队，欢迎他们 🎉 · 团队净增 <strong>+1</strong> 人，稳步成长中</p>
+    </div>
+  </div>
+
+  <div class="focus-row">
+    <div class="focus-item">
+      <div class="focus-num">30</div>
+      <div class="focus-label">合同待续签</div>
+      <div class="focus-tag warn">📬 待办</div>
+    </div>
+    <div class="focus-item">
+      <div class="focus-num grn">0.0%</div>
+      <div class="focus-label">新员工离职率</div>
+      <div class="focus-tag good">👏 亮点</div>
+    </div>
+    <div class="focus-item">
+      <div class="focus-num grn">50.0%</div>
+      <div class="focus-label">高绩效占比</div>
+      <div class="focus-tag good">🏆 亮点</div>
+    </div>
+    <div class="focus-item">
+      <div class="focus-num" style="color:var(--err)">6.6%</div>
+      <div class="focus-label">整体离职率</div>
+      <div class="focus-tag warn">🌿 关注</div>
+    </div>
+  </div>
+
+  <div class="sh"><div class="st">核心指标</div></div>
+  <div class="kpi-g">
+    <div class="kpi-c cb"><div class="kpi-v">31<span class="kpi-u">人</span></div><div class="kpi-l">在职人数</div><span class="kpi-tr fl">→ 持平</span></div>
+    <div class="kpi-c co"><div class="kpi-v">¥27,286</div><div class="kpi-l">薪资均值</div><span class="kpi-tr dn">↓1.1%</span></div>
+    <div class="kpi-c cr"><div class="kpi-v">50.0<span class="kpi-u">%</span></div><div class="kpi-l">高绩效占比 (A+B+)</div><span class="kpi-tr up">↑7.8%</span></div>
+    <div class="kpi-c ce"><div class="kpi-v">6.6<span class="kpi-u">%</span></div><div class="kpi-l">整体离职率</div><span class="kpi-tr dn">↑106%</span></div>
+    <div class="kpi-c cp"><div class="kpi-v">96.8<span class="kpi-u">%</span></div><div class="kpi-l">合同预警率</div><span class="kpi-tr dn" style="background:var(--err-bg);color:var(--err)">高风险</span></div>
+  </div>
+
+  <div class="expand-bar" onclick="toggleDetail()">
+    <span class="expand-btn" id="expandBtn">📊 查看完整数据看板</span>
+  </div>
+
+  <div id="detailSection" style="display:none">
+  <div class="kpi-sg">
+    <div class="kg">
+      <div class="kg-h"><div class="kg-dot" style="background:var(--pri)"></div>人员结构</div>
+      <div class="kg-cards c4">
+        <div class="kg-item"><div class="kg-item-info"><div class="kg-item-label">平均司龄</div><div class="kg-item-val">4.3<span class="u">年</span></div><div class="kg-item-sub">中位 4.2年</div></div></div>
+        <div class="kg-item"><div class="kg-item-info"><div class="kg-item-label">平均年龄</div><div class="kg-item-val">37.6<span class="u">岁</span></div><div class="kg-item-sub">&nbsp;</div></div></div>
+        <div class="kg-item"><div class="kg-item-info"><div class="kg-item-label">男女员工占比</div><div class="kg-item-val">58:42</div><div class="kg-item-sub">男18人·女13人</div></div></div>
+        <div class="kg-item"><div class="kg-item-info"><div class="kg-item-label">学历结构</div><div class="kg-item-val">硕51.6%</div><div class="kg-item-sub">博3人·硕16人·本12人</div></div></div>
+      </div>
+    </div>
+    <div class="kg">
+      <div class="kg-h"><div class="kg-dot" style="background:var(--grn)"></div>人员流动</div>
+      <div class="kg-cards c5">
+        <div class="kg-item"><div class="kg-item-info"><div class="kg-item-label">本月入职</div><div class="kg-item-val" style="color:var(--grn)">3<span class="u">人</span></div><div class="kg-item-sub">含调入</div></div></div>
+        <div class="kg-item"><div class="kg-item-info"><div class="kg-item-label">本月离职</div><div class="kg-item-val" style="color:var(--err)">2<span class="u">人</span></div><div class="kg-item-sub">含调出</div></div></div>
+        <div class="kg-item"><div class="kg-item-info"><div class="kg-item-label">净增减</div><div class="kg-item-val" style="color:var(--grn)">+1<span class="u">人</span></div><div class="kg-item-sub">入-离</div></div></div>
+        <div class="kg-item"><div class="kg-item-info"><div class="kg-item-label">新员工离职率</div><div class="kg-item-val" style="color:var(--grn)">0.0<span class="u">%</span></div><div class="kg-item-sub">&lt;1年</div></div></div>
+        <div class="kg-item"><div class="kg-item-info"><div class="kg-item-label">关键角色离职率</div><div class="kg-item-val" style="color:var(--err)">7.7<span class="u">%</span></div><div class="kg-item-sub">&gt;5%红</div></div></div>
+      </div>
+    </div>
+    <div class="kg">
+      <div class="kg-h"><div class="kg-dot" style="background:var(--pnk)"></div>绩效管理</div>
+      <div class="kg-cards c2">
+        <div class="kg-item"><div class="kg-item-info"><div class="kg-item-label">绩效覆盖率</div><div class="kg-item-val" style="color:var(--pnk)">90.3<span class="u">%</span></div><div class="kg-item-sub">有评级</div></div></div>
+        <div class="kg-item"><div class="kg-item-info"><div class="kg-item-label">各级绩效占比</div><div class="kg-item-val" style="color:var(--pnk)">A10.7%·B+39.3%</div><div class="kg-item-sub">B46.4%·C3.6% · 共28人</div></div></div>
+      </div>
+    </div>
+    <div class="kg">
+      <div class="kg-h"><div class="kg-dot" style="background:var(--gld)"></div>薪酬总览</div>
+      <div class="kg-cards c2">
+        <div class="kg-item"><div class="kg-item-info"><div class="kg-item-label">薪资中位数</div><div class="kg-item-val" style="color:var(--gld)">¥2.0<span class="u">万</span></div><div class="kg-item-sub">P50</div></div></div>
+        <div class="kg-item"><div class="kg-item-info"><div class="kg-item-label">奖金覆盖率</div><div class="kg-item-val" style="color:var(--gld)">100<span class="u">%</span></div><div class="kg-item-sub">有奖金</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-sec">
+    <div class="chart-sh"><div class="chart-sh-t">数据图形分析</div><div style="font-size:11px;color:var(--text4)">按维度切换</div></div>
+    <div class="chart-tabs" id="chartTabs">
+      <div class="ctab active" onclick="switchChartTab(this)" style="--ctc:var(--pri)">人员</div>
+      <div class="ctab" onclick="switchChartTab(this)" style="--ctc:var(--gld)">薪酬</div>
+      <div class="ctab" onclick="switchChartTab(this)" style="--ctc:var(--grn)">流动</div>
+      <div class="ctab" onclick="switchChartTab(this)" style="--ctc:var(--pnk)">绩效</div>
+    </div>
+    <div class="chart-g" id="chartGrid"></div>
+  </div>
+
+  <div class="det-sec" id="detSec" style="display:none">
+    <div style="padding:16px 20px 0"><div class="chart-sh-t">数据明细</div></div>
+    <div style="padding:8px 0" id="accRoot"></div>
+  </div>
+
+  <div class="sh" style="margin-top:8px"><div class="st">关心提示</div></div>
+  <div class="ab-g">
+    <div class="abc yellow"><span class="abc-pri yl">🌿 关注</span><div class="abc-i">💬</div><div class="abc-t">有几位伙伴可能要离开</div><div class="abc-d">目前离职率 6.6%，在合理范围内但值得留意</div><ul class="abc-l"><li>建议约关键岗位的伙伴聊聊近况</li><li>离职面谈时多听听他们的想法</li></ul></div>
+    <div class="abc red"><span class="abc-pri cr">📬 待办</span><div class="abc-i">📋</div><div class="abc-t">30位伙伴的合同即将到期</div><div class="abc-d">别担心，提前准备就好，我来帮你梳理优先级</div><ul class="abc-l"><li>建议本月启动续签流程</li><li>优先处理已过期的伙伴</li></ul></div>
+    <div class="abc blue"><span class="abc-pri bl">🌱 关注</span><div class="abc-i">🌿</div><div class="abc-t">3位新人还在试用期</div><div class="abc-d">他们的转正率目前 90.3%，整体表现不错</div><ul class="abc-l"><li>关注他们的适应情况和目标完成度</li><li>提前安排转正评估</li></ul></div>
+    <div class="abc green"><span class="abc-pri gr">✅ 安心</span><div class="abc-i">💚</div><div class="abc-t">薪酬体系很健康</div><div class="abc-d">奖金覆盖率 100%，带宽比 3.47，差异合理</div><ul class="abc-l"><li>性别薪酬差异仅 4.9%，在健康范围</li><li>整体薪酬结构无需大调整</li></ul></div>
+  </div>
+
+  <div class="sh"><div class="st">给HR的小建议</div></div>
+  <div class="act-g">
+    <div class="actc"><span class="act-tag">🌱 人才</span><div class="act-t">要不要提前储备人才？</div><div class="act-d">运维支持部最近有伙伴离开，提前看看市场上有没合适的人选，心里更踏实。</div></div>
+    <div class="actc"><span class="act-tag" style="background:var(--blu-l);color:var(--blu)">📬 合同</span><div class="act-t">续签可以分批进行</div><div class="act-d">30位伙伴的合同需要处理，按到期日排序，每周处理一批，不会太赶。</div></div>
+    <div class="actc"><span class="act-tag" style="background:var(--pnk-l);color:var(--pnk)">🏆 激励</span><div class="act-t">优秀的人值得被看见</div><div class="act-d">A级人才的绩效很突出，一个简单的认可或激励计划，能让他们感受到被重视。</div></div>
+  </div>
+
+  <div class="fn"><b>统计口径：</b>在职人数：统计截止日在职员工，含试用期 · 司龄：入职日至截止日实际天数÷365.25 · 离职率：本月离职÷((月初+月末)÷2)×100% · 高绩效：A+B+÷有绩效人数 · 环比基期：2026年5月 · 生成时间：2026-06-22 11:32</div>
+</div>
+</div>
+<div id="modulePage" style="display:none">
+  <div id="mpKpi" class="mp-sec"></div>
+  <div id="mpChart" class="mp-sec"></div>
+  <div id="mpData" class="mp-sec"></div>
+  <div id="mpAnalysis" class="mp-sec"></div>
+</div>
+</main>
+
+<div class="dov" id="dov" onclick="toggleDrawer()"></div>
+<aside class="dr" id="drawer">
+  <div class="dr-h"><div class="dr-ti"><i class="ti ti-adjustments-horizontal" style="font-size:16px;color:var(--pri);margin-right:6px"></i> 指标配置</div><button class="dr-x" onclick="toggleDrawer()">✕</button></div>
+  <div class="dr-pr"><div class="dr-pl">快速预设</div><div class="dr-pb" id="drPresets"></div></div>
+  <div class="dr-b" id="drBody"></div>
+  <div class="dr-f"><div class="dr-sc">已选 <b id="selCount">62</b> 项</div><div class="dr-fb"><button class="btn" style="padding:6px 12px;font-size:12px;border-color:var(--bd)" onclick="clearAll()">清空</button><button class="btn btn-pri" style="padding:6px 12px;font-size:12px" onclick="applyAndClose()">应用</button></div></div>
+</aside>
+
+<script>
+
+var CD={gender:{l:["男","女"],d:[18,13]},tenure:{l:["0-1年","1-3年","3-5年","5-10年","10年+"],d:[1,10,9,11,0]},age:{l:["20-25岁","26-30岁","31-35岁","36-40岁","40岁+"],d:[2,5,6,6,12]},edu:{l:["硕士","本科","博士"],d:[16,12,3]},perf:{l:["A","B+","B","C"],d:[3,11,13,1]},salhist:{l:["<1.5万","1.5-2.5万","2.5-3.5万","3.5-5万","5万+"],d:[1,14,11,4,1]},depsal:{l:["综合管理部","研发中心","运维支持部","产品管理部","测试部"],d:[51653,27760,22906,22406,21065]},depto:{l:["运维支持部","产品管理部","研发中心","测试部","综合管理部"],d:[25,20,0,0,0]},perfsal:{l:["A","B","B+","C"],d:[23398,24772,24453,29713]},move:{l:["调入","入职","离职","调出"],d:[1,2,1,1]},rolesal:{l:["HR总监","HR BP","部门主管","技术专家","项目经理","普通员工"],d:[42000,34000,35000,38000,28000,21200]},gensal:{l:["男(18人)","女(13人)"],d:[27800,26500]},cityto:{l:["深圳","北京","上海","广州"],d:[10,25,20,0]},roleto:{l:["普通员工","部门主管","项目经理","技术专家","HR BP","HR总监"],d:[15.4,50,33.3,0,0,0]},eduto:{l:["硕士","本科","博士"],d:[7.1,7.7,0]},tentoto:{l:["0-1年","1-3年","3-5年","5-10年","10年+"],d:[0,30,0,0,0]},s5num:{l:["最低","P25","中位","P75","最高"],d:[15000,21500,27000,31000,52000]},edusal:{l:["硕士","本科","博士"],d:[28500,26000,29000]},citysal:{l:["深圳","北京","上海","广州"],d:[29000,27200,26500,24000]},dephp:{l:["综合管理部","研发中心","运维支持部","产品管理部","测试部"],d:[80,60,50,40,30]},rolecnt:{l:["HR总监","HR BP","部门主管","技术专家","项目经理","普通员工","综合管理"],d:[1,2,2,5,3,13,5]},deptcnt:{l:["研发中心","测试部","综合管理部","产品管理部","运维支持部"],d:[10,7,5,5,4]},deptA:{l:["综合管理部","研发中心","运维支持部","产品管理部","测试部"],d:[2,1,0,0,0]},deptBp:{l:["综合管理部","研发中心","运维支持部","产品管理部","测试部"],d:[2,4,2,2,1]},deptB:{l:["综合管理部","研发中心","运维支持部","产品管理部","测试部"],d:[1,4,2,3,3]},deptC:{l:["综合管理部","研发中心","运维支持部","产品管理部","测试部"],d:[0,1,0,0,0]},saltenure:{l:["0-1年","1-3年","3-5年","5-10年"],d:[18000,22500,28000,32000]},trate:{l:["整体离职率","健康阈值"],d:[6.6,5]}};
+
+var CAT=[
+{id:"ppl",label:"人员结构",color:"#C2410C",ico:"users",metrics:[
+{id:"active_count",label:"在职人数",note:"截止日在职总人数"},
+{id:"avg_age",label:"平均年龄",note:"37.6岁"},
+{id:"gender_dist",label:"性别比例",note:"男/女"},
+{id:"edu_dist",label:"学历分布",note:"博/硕/本"},
+{id:"marriage_dist",label:"婚育分布",note:"未婚/已育"},
+{id:"school_dist",label:"院校分布",note:"Top10"},
+{id:"role_dist",label:"岗位角色",note:"关键岗位/普通员工"},
+{id:"position_dist",label:"岗位分布",note:"各岗位人数"},
+{id:"dept_dist",label:"部门分布",note:"各部门人数"},
+{id:"probation_count",label:"试用期人数",note:"转正日期为空"},
+{id:"confirm_rate",label:"转正率",note:"已转正/应转正"},
+{id:"avg_tenure",label:"平均司龄",note:"单位：年"},
+{id:"median_tenure",label:"司龄中位数",note:"P50"},
+{id:"tenure_dist",label:"司龄分布",note:"五段分布"},
+{id:"age_dist",label:"年龄分布",note:"五段分布"},
+{id:"contract_warning_rate",label:"合同预警率",note:"预警/在职"},
+{id:"contract_warnings",label:"预警明细",note:"三级预警"}
+]},
+{id:"flow",label:"人员流动",color:"#10B981",ico:"arrows-shuffle",metrics:[
+{id:"join_count",label:"入职人数",note:"本月+调入"},
+{id:"leave_count",label:"离职人数",note:"本月+调出"},
+{id:"net_change",label:"净增减",note:"入-离"},
+{id:"move_type_dist",label:"入离职类型",note:"入/调/离/出"},
+{id:"turnover_rate",label:"整体离职率",note:"6.6%"},
+{id:"new_hire_turnover_rate",label:"新员工离职率",note:"<1年"},
+{id:"dept_turnover",label:"部门离职率",note:"各部门"},
+{id:"city_turnover",label:"城市离职率",note:"各城市"},
+{id:"role_turnover",label:"岗位离职率",note:"各角色"},
+{id:"edu_turnover",label:"学历离职率",note:"各学历"},
+{id:"tenure_turnover",label:"司龄离职率",note:"各司龄段"},
+{id:"key_role_turnover_rate",label:"关键角色离职率",note:"关键岗位"},
+{id:"leave_dept_dist",label:"离职部门分布",note:"详细"},
+{id:"leave_position_dist",label:"离职岗位分布",note:"详细"},
+{id:"turnover_formula",label:"离职率公式",note:"计算方法"}
+]},
+{id:"perf",label:"绩效管理",color:"#EC4899",ico:"star",metrics:[
+{id:"perf_grade_dist",label:"绩效等级分布",note:"A/B+/B/C"},
+{id:"perf_coverage_rate",label:"绩效覆盖率",note:"90.3%"},
+{id:"high_perf_rate",label:"高绩效占比",note:"A+B+"},
+{id:"perf_quant_mean",label:"绩效均分",note:"量化均分"},
+{id:"perf_salary_cross",label:"绩效×薪资",note:"交叉分析"},
+{id:"perf_by_dept",label:"绩效×部门",note:"各部门"},
+{id:"perf_by_tenure",label:"绩效×司龄",note:"各司龄段"},
+{id:"perf_by_position",label:"绩效×岗位",note:"各岗位"}
+]},
+{id:"sal",label:"薪酬总览",color:"#F59E0B",ico:"coin",metrics:[
+{id:"salary_mean",label:"薪资均值",note:"¥27,286"},
+{id:"salary_median",label:"薪资中位数",note:"P50"},
+{id:"salary_5num",label:"薪资五数",note:"五数概括"},
+{id:"salary_hist",label:"薪资区间",note:"分布直方图"},
+{id:"salary_range",label:"薪酬带宽",note:"Max-Min"},
+{id:"salary_range_ratio",label:"带宽比",note:"Max/Min"},
+{id:"bonus_mean",label:"奖金均值",note:"¥5,832"},
+{id:"bonus_total",label:"奖金总额",note:"¥180,806"},
+{id:"bonus_coverage_rate",label:"奖金覆盖率",note:"100%"},
+{id:"bonus_salary_ratio",label:"奖金薪资比",note:"21.4%"},
+{id:"salary_by_dept",label:"部门薪资均值",note:"各部门"},
+{id:"salary_by_role",label:"岗位薪资对比",note:"各角色"},
+{id:"salary_by_edu",label:"学历薪资对比",note:"各学历"},
+{id:"salary_by_city",label:"城市薪资对比",note:"各城市"},
+{id:"salary_by_tenure",label:"司龄薪资对比",note:"各司龄段"},
+{id:"gender_salary_gap",label:"性别薪酬差异",note:"4.9%"},
+{id:"salary_by_position",label:"岗位薪资分布",note:"各岗位"}
+]},
+{id:"cntr",label:"合同管理",color:"#3B82F6",ico:"file-text",metrics:[
+{id:"join_count",label:"入职人数",note:"本月+调入"},
+{id:"leave_count",label:"离职人数",note:"本月+调出"},
+{id:"net_change",label:"净增减",note:"入-离"},
+{id:"move_type_dist",label:"入离职类型",note:"分布"},
+{id:"contract_warning_rate",label:"合同预警率",note:"96.8%"}
+]},
+{id:"tne",label:"司龄分析",color:"#FB7185",ico:"clock",metrics:[
+{id:"avg_tenure",label:"平均司龄",note:"4.3年"},
+{id:"median_tenure",label:"司龄中位数",note:"4.2年"},
+{id:"tenure_dist",label:"司龄分布",note:"五段"},
+{id:"tenure_turnover",label:"司龄离职率",note:"各司龄段"},
+{id:"salary_by_tenure",label:"司龄薪资",note:"各段均值"}
+]}
+];
+
+var PRESETS=[
+{id:"full",label:"完整版(62项)",ids:"__ALL__"},
+{id:"exec",label:"高管版(10项)",ids:["active_count","avg_tenure","gender_dist","turnover_rate","new_hire_turnover_rate","key_role_turnover_rate","salary_mean","high_perf_rate","contract_warning_rate","net_change"]},
+{id:"attrition",label:"离职专题(12项)",ids:["leave_count","net_change","turnover_rate","new_hire_turnover_rate","dept_turnover","city_turnover","role_turnover","edu_turnover","tenure_turnover","key_role_turnover_rate","leave_dept_dist","leave_position_dist"]},
+{id:"salary",label:"薪酬专题(15项)",ids:["salary_mean","salary_median","salary_5num","salary_hist","salary_range","salary_range_ratio","bonus_mean","bonus_total","bonus_coverage_rate","bonus_salary_ratio","salary_by_dept","salary_by_role","salary_by_edu","salary_by_city","gender_salary_gap"]},
+{id:"perf",label:"绩效专题(8项)",ids:["perf_grade_dist","perf_coverage_rate","high_perf_rate","perf_quant_mean","perf_salary_cross","perf_by_dept","perf_by_tenure","perf_by_position"]}
+];
+
+function T(h){return '<tr>'+h+'</tr>'}
+function TH(c){return '<th>'+c+'</th>'}
+function TD(c){return '<td>'+c+'</td>'}
+function tbl(headers,rows){
+  var h='<tr>'+headers.map(TH).join('')+'</tr>';
+  var b=rows.map(function(r){return '<tr>'+r.map(TD).join('')+'</tr>'}).join('');
+  return '<table class="dt">'+h+b+'</table>';
+}
+
+var BL={
+active_count:tbl(['指标','数值','环比'],[['在职人数','31人','→']]),
+avg_tenure:tbl(['均值','中位数'],[['4.3年','4.2年']]),
+median_tenure:tbl(['均值','中位数'],[['4.3年','4.2年']]),
+tenure_dist:tbl(['司龄段','人','占比'],[['0-1年','1','3.2%'],['1-3年','10','32.3%'],['3-5年','9','29.0%'],['5-10年','11','35.5%'],['10年+','0','0%']]),
+probation_count:tbl(['试用期','转正率'],[['3人','90.3%']]),
+confirm_rate:tbl(['试用期','转正率'],[['3人','90.3%']]),
+avg_age:tbl(['平均年龄'],[['37.6岁']]),
+age_dist:tbl(['年龄段','人','占比'],[['20-25岁','2','6.5%'],['26-30岁','5','16.1%'],['31-35岁','6','19.4%'],['36-40岁','6','19.4%'],['40岁+','12','38.7%']]),
+gender_dist:tbl(['性别','人','占比'],[['男','18','58.1%'],['女','13','41.9%']]),
+edu_dist:tbl(['学历','人','占比'],[['硕士','16','51.6%'],['本科','12','38.7%'],['博士','3','9.7%']]),
+marriage_dist:tbl(['婚育','人','占比'],[['未婚','13','41.9%'],['已育','11','35.5%'],['已婚未育','7','22.6%']]),
+school_dist:tbl(['院校','人'],[['北京大学','4'],['清华大学','4'],['北航','3'],['其他','20']]),
+role_dist:tbl(['角色','人','占比'],[['普通员工','13','41.9%'],['技术专家','5','16.1%'],['综合管理','5','16.1%'],['项目经理','3','9.7%'],['部门主管','2','6.5%'],['HR BP','2','6.5%'],['HR总监','1','3.2%']]),
+position_dist:tbl(['岗位','人'],[['普通员工','13'],['综合管理','5'],['技术专家','5'],['项目经理','3'],['HR BP','2'],['部门主管','2'],['HR总监','1']]),
+contract_warning_rate:tbl(['级别','人','占比'],[['已过期','28','90.3%'],['30天内','2','6.5%'],['正常','1','3.2%']]),
+contract_warnings:tbl(['姓名','部门','到期','状态'],[['张某','运维','05-15','过期'],['李某','研发','05-20','过期'],['王某','产品','06-15','即将']]),
+dept_dist:tbl(['部门','人','占比'],[['研发中心','10','32.3%'],['测试部','7','22.6%'],['综合管理部','5','16.1%'],['产品管理部','5','16.1%'],['运维支持部','4','12.9%']]),
+join_count:tbl(['类型','人'],[['入职','2'],['调入','1'],['合计','3']]),
+leave_count:tbl(['类型','人'],[['离职','1'],['调出','1'],['合计','2']]),
+net_change:tbl(['入','离','净增'],[['3','2','+1']]),
+move_type_dist:tbl(['类型','人'],[['入职','2'],['调入','1'],['离职','1'],['调出','1']]),
+leave_dept_dist:tbl(['部门','离职','离职率'],[['运维支持部','1','25.0%'],['产品管理部','1','20%'],['研发中心','0','0%']]),
+leave_position_dist:tbl(['岗位','离职'],[['部门主管','1'],['项目经理','1']]),
+turnover_formula:tbl(['项目','数值'],[['离职','2人'],['月初','30人'],['月末','31人'],['平均','30.5人'],['离职率','6.6%']]),
+perf_grade_dist:tbl(['等级','人','占比'],[['A','3','10.7%'],['B+','11','39.3%'],['B','13','46.4%'],['C','1','3.6%']]),
+perf_coverage_rate:tbl(['在职','有绩效','覆盖率'],[['31','28','90.3%']]),
+high_perf_rate:tbl(['A+B+','有绩效','占比'],[['14','28','50.0%']]),
+perf_quant_mean:tbl(['指标','数值'],[['均分','3.42'],['标准差','0.51']]),
+perf_salary_cross:tbl(['等级','人','均薪'],[['A','3','¥23,398'],['B+','11','¥24,453'],['B','13','¥24,772'],['C','1','¥29,713']]),
+perf_by_dept:tbl(['部门','高绩效占比'],[['综合管理部','80%'],['研发中心','60%'],['运维支持部','50%'],['产品管理部','40%'],['测试部','30%']]),
+perf_by_tenure:tbl(['司龄','高绩效占比'],[['0-1年','0%'],['1-3年','40%'],['3-5年','55.6%'],['5-10年','54.5%']]),
+perf_by_position:tbl(['岗位','高绩效占比'],[['HR总监','100%'],['技术专家','60%'],['项目经理','33.3%'],['普通员工','46.2%']]),
+salary_mean:tbl(['均值','中位数','标准差'],[['¥27,286','¥27,000','¥7,842']]),
+salary_median:tbl(['P50'],[['¥27,000']]),
+salary_5num:tbl(['最低','P25','P50','P75','最高'],[['15k','21.5k','27k','31k','52k']]),
+salary_hist:tbl(['区间','人','占比'],[['<1.5万','1','3.2%'],['1.5-2.5万','14','45.2%'],['2.5-3.5万','11','35.5%'],['3.5-5万','4','12.9%'],['5万+','1','3.2%']]),
+salary_range:tbl(['最低','最高','带宽','比'],[['15k','52k','37k','3.47']]),
+salary_range_ratio:tbl(['最低','最高','带宽','比'],[['15k','52k','37k','3.47']]),
+bonus_mean:tbl(['奖金均值'],[['¥5,832']]),
+bonus_total:tbl(['总额','人数'],[['¥180,806','31']]),
+bonus_coverage_rate:tbl(['有奖金','在职','覆盖率'],[['31','31','100%']]),
+bonus_salary_ratio:tbl(['奖金','薪资','比率'],[['¥5,832','¥27,286','21.4%']]),
+salary_by_dept:tbl(['部门','均值'],[['综合管理部','¥51,653'],['研发中心','¥27,760'],['运维支持部','¥22,906'],['产品管理部','¥22,406'],['测试部','¥21,065']]),
+salary_by_role:tbl(['岗位','均值'],[['HR总监','¥42,000'],['技术专家','¥38,000'],['部门主管','¥35,000'],['HR BP','¥34,000'],['项目经理','¥28,000'],['普通员工','¥21,200']]),
+salary_by_edu:tbl(['学历','均值'],[['博士','¥29,000'],['硕士','¥28,500'],['本科','¥26,000']]),
+salary_by_city:tbl(['城市','均值'],[['深圳','¥29,000'],['北京','¥27,200'],['上海','¥26,500'],['广州','¥24,000']]),
+salary_by_tenure:tbl(['司龄','均值'],[['0-1年','¥18,000'],['1-3年','¥22,500'],['3-5年','¥28,000'],['5-10年','¥32,000']]),
+gender_salary_gap:tbl(['性别','人','均值','差异'],[['男','18','¥27,800','4.9%'],['女','13','¥26,500','']]),
+salary_by_position:tbl(['岗位','最低','最高','均值'],[['HR总监','42k','42k','42k'],['技术专家','32k','52k','38k'],['部门主管','30k','40k','35k']]),
+turnover_rate:tbl(['离职','平均','离职率'],[['2','30.5','6.6%']]),
+new_hire_turnover_rate:tbl(['<1年离职','人数','离职率'],[['0','1','0.0%']]),
+dept_turnover:tbl(['部门','离职率'],[['运维支持部','25.0%'],['产品管理部','20.0%'],['研发中心','0%'],['测试部','0%'],['综合管理部','0%']]),
+city_turnover:tbl(['城市','离职率'],[['北京','25.0%'],['上海','20.0%'],['深圳','10.0%'],['广州','0%']]),
+role_turnover:tbl(['岗位','离职率'],[['部门主管','50.0%'],['项目经理','33.3%'],['普通员工','15.4%'],['技术专家','0%']]),
+edu_turnover:tbl(['学历','离职率'],[['本科','7.7%'],['硕士','7.1%'],['博士','0%']]),
+tenure_turnover:tbl(['司龄','离职率'],[['1-3年','30.0%'],['0-1年','0%'],['3-5年','0%'],['5-10年','0%']]),
+key_role_turnover_rate:tbl(['关键角色','离职','离职率'],[['主管+PM','2','7.7%']])
+};
+
+var sel=new Set(),chartInst=[],chartTab='all',sideTab='all';
+CAT.forEach(function(m){m.metrics.forEach(function(x){sel.add(x.id)})});
+
+function gp(){return['#7C3AED','#0EA57A','#E04D8B','#D4932B','#3B7DD8','#D4686A','#8B5CF6','#06B6D4']}
+
+function dc(){chartInst.forEach(function(c){c.destroy()});chartInst=[]}
+
+function dn(cn,l,d){
+  var ctx=document.getElementById(cn);if(!ctx)return;
+  var ci=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:l.map(function(x,i){return x+' '+d[i]+'人'}),datasets:[{data:d,backgroundColor:gp().slice(0,l.length),borderWidth:2,borderColor:'#FFF7ED'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{
+        legend:{position:'right',labels:{font:{size:10},color:'#1C1917',boxWidth:8,padding:4}},
+        datalabels:{display:true,font:{size:10,weight:'bold'},color:'#fff',formatter:function(v){return v}}
+      }
+    }
+  });
+  chartInst.push(ci);
+}
+
+function br(cn,l,d,u){
+  var ctx=document.getElementById(cn);if(!ctx)return;
+  var bg=l.map(function(_,i){return gp()[i%gp().length]});
+  var ci=new Chart(ctx,{
+    type:'bar',
+    data:{labels:l,datasets:[{data:d,backgroundColor:bg,borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:function(c){return ' '+c.formattedValue+(u||'')}}},
+        datalabels:{display:true,anchor:'end',align:'end',font:{size:10,weight:'bold'},formatter:function(v){return v+(u||'')},color:'#1C1917'}
+      },
+      scales:{
+        y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10},color:'#1C1917'}},
+        x:{grid:{display:false},ticks:{font:{size:10},color:'#1C1917'}}
+      }
+    },
+    plugins:typeof ChartDataLabels!=='undefined'?[ChartDataLabels]:[]
+  });
+  chartInst.push(ci);
+}
+
+function hb(cn,l,d,u){
+  var ctx=document.getElementById(cn);if(!ctx)return;
+  var ci=new Chart(ctx,{
+    type:'bar',
+    data:{labels:l,datasets:[{data:d,backgroundColor:l.map(function(_,i){return gp()[i%gp().length]}),borderRadius:4}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        datalabels:{display:true,anchor:'end',align:'right',font:{size:10,weight:'bold'},formatter:function(v){return v+(u||'')},color:'#1C1917'}
+      },
+      scales:{
+        x:{beginAtZero:true,grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10},color:'#1C1917'}},
+        y:{grid:{display:false},ticks:{font:{size:10},color:'#1C1917'}}
+      }
+    },
+    plugins:typeof ChartDataLabels!=='undefined'?[ChartDataLabels]:[]
+  });
+  chartInst.push(ci);
+}
+
+function sb(cn){
+  var ctx=document.getElementById(cn);if(!ctx)return;
+  var p=['#EC4899','#F472B6','#F9A8D4','#FBCFE8'];
+  var ci=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:CD.deptA.l,
+      datasets:[
+        {label:'A',data:CD.deptA.d,backgroundColor:p[0],borderRadius:4},
+        {label:'B+',data:CD.deptBp.d,backgroundColor:p[1],borderRadius:4},
+        {label:'B',data:CD.deptB.d,backgroundColor:p[2],borderRadius:4},
+        {label:'C',data:CD.deptC.d,backgroundColor:p[3],borderRadius:4}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true,grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10},color:'#1C1917'}}},
+      plugins:{
+        legend:{position:'top',labels:{font:{size:10},color:'#1C1917',boxWidth:10,padding:4}},
+        datalabels:{display:true,font:{size:9,weight:'bold'},color:'#fff',formatter:function(v){return v||''}}
+      }
+    },
+    plugins:typeof ChartDataLabels!=='undefined'?[ChartDataLabels]:[]
+  });
+  chartInst.push(ci);
+}
+
+function sbd(cn){
+  var ctx=document.getElementById(cn);if(!ctx)return;
+  var g=['#EC4899','#F472B6','#F9A8D4','#FBCFE8'];
+  var labels=CD.perf.l;
+  var total=CD.perf.d.reduce(function(a,b){return a+b},0);
+  var pcts=CD.perf.d.map(function(v){return (v/total*100).toFixed(1)+'%'});
+  var ci=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:labels.map(function(l,i){return l+' '+pcts[i]+' ('+CD.perf.d[i]+'人)'}),datasets:[{data:CD.perf.d,backgroundColor:g,borderWidth:2,borderColor:'#FFF7ED'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'55%',
+      plugins:{legend:{position:'right',labels:{font:{size:10},color:'#1C1917',boxWidth:10,padding:4}},datalabels:{display:true,font:{size:10,weight:'bold'},color:'#fff',formatter:function(v){return v}}}
+    }
+  });
+  chartInst.push(ci);
+}
+
+function buildCharts(){
+  var g=document.getElementById('chartGrid');g.innerHTML='';dc();
+  var idx=0,MX=9,shown={};
+  function ac(lb,id,fn,cat,tc,mid){
+    if(idx>=MX||shown[id])return;
+    if(chartTab!=='all'&&tc!==chartTab)return;
+    if(mid&&!sel.has(mid))return;
+    var w=document.createElement('div');
+    w.innerHTML='<div class="ci-l">'+lb+' <span class="ci-t">'+cat+'</span></div><div class="cw"><canvas id="'+id+'"></canvas></div>';
+    g.appendChild(w);shown[id]=1;setTimeout(function(){fn(id)},80);idx++;
+  }
+  ac('性别比例','g0',function(i){dn(i,CD.gender.l,CD.gender.d)},'人员','ppl','gender_dist');
+  ac('薪资区间','g1',function(i){br(i,CD.salhist.l,CD.salhist.d,'人')},'薪酬','sal','salary_hist');
+  ac('整体离职率','g2',function(i){br(i,CD.trate.l,CD.trate.d,'%')},'流动','flow','turnover_rate');
+  ac('绩效等级','g3',function(i){dn(i,CD.perf.l,CD.perf.d)},'绩效','perf','perf_grade_dist');
+  ac('司龄分布','g4',function(i){br(i,CD.tenure.l,CD.tenure.d,'人')},'司龄','ppl','tenure_dist');
+  ac('部门薪资','g5',function(i){hb(i,CD.depsal.l,CD.depsal.d,'元')},'薪酬','sal','salary_by_dept');
+  ac('入离职类型','g6',function(i){dn(i,CD.move.l,CD.move.d)},'流动','flow','move_type_dist');
+  ac('绩效×薪资','g7',function(i){br(i,CD.perfsal.l,CD.perfsal.d,'元')},'绩效','perf','perf_salary_cross');
+  ac('年龄分布','g8',function(i){br(i,CD.age.l,CD.age.d,'人')},'人员','ppl','age_dist');
+  ac('岗位薪资','g9',function(i){hb(i,CD.rolesal.l,CD.rolesal.d,'元')},'薪酬','sal','salary_by_role');
+  ac('岗位离职率','g10',function(i){hb(i,CD.roleto.l,CD.roleto.d,'%')},'流动','flow','role_turnover');
+  ac('学历分布','g11',function(i){hb(i,CD.edu.l,CD.edu.d,'人')},'人员','ppl','edu_dist');
+  ac('性别薪资差','g12',function(i){br(i,CD.gensal.l,CD.gensal.d,'元')},'薪酬','sal','gender_salary_gap');
+  ac('城市离职率','g13',function(i){hb(i,CD.cityto.l,CD.cityto.d,'%')},'流动','flow','city_turnover');
+  ac('薪资五数','g14',function(i){br(i,CD.s5num.l,CD.s5num.d,'元')},'薪酬','sal','salary_5num');
+  ac('学历离职率','g15',function(i){hb(i,CD.eduto.l,CD.eduto.d,'%')},'流动','flow','edu_turnover');
+  ac('司龄离职率','g16',function(i){hb(i,CD.tentoto.l,CD.tentoto.d,'%')},'流动','flow','tenure_turnover');
+  ac('学历薪资','g17',function(i){hb(i,CD.edusal.l,CD.edusal.d,'元')},'薪酬','sal','salary_by_edu');
+  ac('城市薪资','g18',function(i){hb(i,CD.citysal.l,CD.citysal.d,'元')},'薪酬','sal','salary_by_city');
+  ac('部门高绩效','g19',function(i){hb(i,CD.dephp.l,CD.dephp.d,'%')},'绩效','perf','perf_by_dept');
+  ac('职级结构','g20',function(i){hb(i,CD.rolecnt.l,CD.rolecnt.d,'人')},'人员','ppl','role_dist');
+  ac('编制结构','g21',function(i){br(i,CD.deptcnt.l,CD.deptcnt.d,'人')},'人员','ppl','dept_dist');
+  ac('绩效占比','g22',function(i){sbd(i)},'绩效','perf','perf_grade_dist');
+  ac('各级别人数','g23',function(i){br(i,CD.perf.l,CD.perf.d,'人')},'绩效','perf','perf_grade_dist');
+  ac('部门绩效分布','g24',function(i){sb(i)},'绩效','perf','perf_by_dept');
+  if(!idx)g.innerHTML='<div class="ce">该域暂无图表</div>';
+}
+
+function buildAcc(){
+  var root=document.getElementById('accRoot');if(!root)return;
+  root.innerHTML='';var hasAny=false;
+  CAT.forEach(function(mod,mi){
+    if(sideTab!=='all'&&mod.id!==sideTab)return;
+    var ms=mod.metrics.filter(function(m){return sel.has(m.id)&&BL[m.id]});
+    if(!ms.length)return;hasAny=true;
+    var it=document.createElement('div');it.className='ai';
+    var op=mi===0&&sideTab==='all'?'open':'';
+    it.innerHTML='<div class="ah" onclick="ta(this)"><div class="ah-l"><div class="ad" style="background:'+mod.color+';box-shadow:0 0 6px '+mod.color+'"></div><div class="at">'+mod.label+'</div><div class="ac">'+ms.length+'项</div></div><div class="aarrow '+op+'">▶</div></div><div class="ab '+op+'"><div class="dtg">'+ms.map(function(m){return '<div class="dc"><div class="dc-t">'+m.label+'</div>'+BL[m.id]+'</div>'}).join('')+'</div></div>';
+    root.appendChild(it);
+  });
+  if(!hasAny)root.innerHTML='<div style="padding:20px;color:var(--text4);font-size:13px;text-align:center">该域暂无数据</div>';
+}
+
+function ta(h){h.nextElementSibling.classList.toggle('open');h.querySelector('.aarrow').classList.toggle('open')}
+
+function clickTab(tab,el){
+  document.querySelectorAll('#sidebar .s-item').forEach(function(t){t.classList.remove('active')});
+  if(el)el.classList.add('active');
+  sideTab=tab;
+  var ov=document.getElementById('overviewPage');
+  var mp=document.getElementById('modulePage');
+  var ds=document.getElementById('detSec');
+  if(tab==='all'){
+    if(ov)ov.style.display='block';
+    if(mp)mp.style.display='none';
+    if(ds)ds.style.display='none';
+  }else{
+    if(ov)ov.style.display='none';
+    if(mp)mp.style.display='block';
+    renderModulePage(tab);
+  }
+}
+
+function renderModulePage(tab){
+  var pages={
+    ppl:{title:'人员结构',color:'#C2410C',kpi:[
+      {v:'31人',l:'在职人数'},{v:'4.3年',l:'平均司龄'},{v:'37.6岁',l:'平均年龄'},{v:'58:42',l:'男女比'}
+    ],charts:[
+      {id:'mg0',lb:'性别比例',fn:function(i){dn(i,CD.gender.l,CD.gender.d)}},
+      {id:'mg1',lb:'年龄分布',fn:function(i){br(i,CD.age.l,CD.age.d,'人')}},
+      {id:'mg2',lb:'学历分布',fn:function(i){hb(i,CD.edu.l,CD.edu.d,'人')}},
+      {id:'mg3',lb:'职级结构',fn:function(i){hb(i,CD.rolecnt.l,CD.rolecnt.d,'人')}}
+    ],data:[
+      {id:'tenure_dist',lb:'司龄分布'},{id:'dept_dist',lb:'部门分布'},{id:'role_dist',lb:'岗位角色'},{id:'marriage_dist',lb:'婚育分布'}
+    ],analysis:[
+      '团队平均司龄4.3年，中位数4.2年，核心骨干稳定（5-10年占35.5%）。',
+      '40岁以上员工占38.7%，建议关注关键岗位的年龄结构优化。',
+      '男女比例58:42，硕士及以上学历占61.3%，团队学历素质较高。',
+      '研发中心10人（32.3%）为最大部门，关键角色（主管+专家）7人。'
+    ]},
+    flow:{title:'人员流动',color:'#10B981',kpi:[
+      {v:'3人',l:'本月入职'},{v:'2人',l:'本月离职'},{v:'+1人',l:'净增减'},{v:'6.6%',l:'整体离职率'}
+    ],charts:[
+      {id:'mg4',lb:'岗位离职率',fn:function(i){br(i,CD.roleto.l,CD.roleto.d,'%')}},
+      {id:'mg5',lb:'城市离职率',fn:function(i){br(i,CD.cityto.l,CD.cityto.d,'%')}},
+      {id:'mg6',lb:'学历离职率',fn:function(i){br(i,CD.eduto.l,CD.eduto.d,'%')}},
+      {id:'mg7',lb:'司龄离职率',fn:function(i){br(i,CD.tentoto.l,CD.tentoto.d,'%')}}
+    ],data:[
+      {id:'turnover_formula',lb:'离职率计算'},{id:'leave_dept_dist',lb:'离职部门'},{id:'leave_position_dist',lb:'离职岗位'},{id:'new_hire_turnover_rate',lb:'新员工离职'}
+    ],analysis:[
+      '本月入职3人、离职2人，净增1人，团队规模小幅增长。',
+      '整体离职率6.6%，处于黄色预警区间（5-10%），需关注。',
+      '运维支持部离职率25%最高，产品管理部20%次之，需针对性访谈。',
+      '关键角色（部门主管+项目经理）离职率7.7%，超出5%警戒线。'
+    ]},
+    perf:{title:'绩效管理',color:'#EC4899',kpi:[
+      {v:'90.3%',l:'绩效覆盖率'},{v:'50.0%',l:'高绩效占比'},{v:'28人',l:'有绩效人数'},{v:'3.42',l:'绩效均分'}
+    ],charts:[
+      {id:'mg8',lb:'绩效等级占比',fn:function(i){sbd(i)}},
+      {id:'mg9',lb:'各级别人数',fn:function(i){br(i,CD.perf.l,CD.perf.d,'人')}},
+      {id:'mg10',lb:'部门绩效分布',fn:function(i){sb(i)}},
+      {id:'mg11',lb:'绩效×薪资',fn:function(i){br(i,CD.perfsal.l,CD.perfsal.d,'元')}}
+    ],data:[
+      {id:'perf_grade_dist',lb:'等级分布'},{id:'perf_salary_cross',lb:'绩效×薪资'},{id:'perf_by_dept',lb:'绩效×部门'},{id:'perf_by_position',lb:'绩效×岗位'}
+    ],analysis:[
+      '绩效覆盖率90.3%（28/31人），A+B+占比50%，整体表现良好。',
+      'B级占46.4%为最大群体，建议对B+级员工制定针对性提升计划。',
+      'C级仅1人（3.6%），绩效预警覆盖面小，需关注其改进计划。',
+      '综合管理部高绩效占比80%最高，测试部30%最低，需分析原因。'
+    ]},
+    sal:{title:'薪酬总览',color:'#F59E0B',kpi:[
+      {v:'¥27,286',l:'薪资均值'},{v:'¥27,000',l:'薪资中位数'},{v:'¥5,832',l:'奖金均值'},{v:'3.47',l:'薪酬带宽比'}
+    ],charts:[
+      {id:'mg12',lb:'薪资区间分布',fn:function(i){br(i,CD.salhist.l,CD.salhist.d,'人')}},
+      {id:'mg13',lb:'部门薪资对比',fn:function(i){hb(i,CD.depsal.l,CD.depsal.d,'元')}},
+      {id:'mg14',lb:'岗位薪资对比',fn:function(i){hb(i,CD.rolesal.l,CD.rolesal.d,'元')}},
+      {id:'mg15',lb:'性别薪资差异',fn:function(i){br(i,CD.gensal.l,CD.gensal.d,'元')}}
+    ],data:[
+      {id:'salary_5num',lb:'薪资五数'},{id:'salary_by_dept',lb:'部门薪资'},{id:'salary_by_role',lb:'岗位薪资'},{id:'gender_salary_gap',lb:'性别差异'}
+    ],analysis:[
+      '薪资均值¥27,286，中位数¥27,000，分布均衡无明显偏态。',
+      '薪酬带宽比3.47处于合理区间，最低¥15k至最高¥52k。',
+      '综合管理部均薪¥51,653远高于其他部门（含高管薪酬拉高）。',
+      '性别薪酬差异4.9%，在可接受范围内，建议持续监控。'
+    ]},
+    cntr:{title:'合同管理',color:'#3B82F6',kpi:[
+      {v:'96.8%',l:'合同预警率'},{v:'28人',l:'已过期'},{v:'2人',l:'30天内到期'},{v:'1人',l:'正常'}
+    ],charts:[
+      {id:'mg16',lb:'预警状态分布',fn:function(i){dn(i,['已过期','30天内','正常'],[28,2,1])}}
+    ],data:[
+      {id:'contract_warning_rate',lb:'预警率'},{id:'contract_warnings',lb:'预警明细'}
+    ],analysis:[
+      '合同预警率高达96.8%，28人合同已过期（红色），2人30天内到期（黄色）。',
+      '建议本月内启动批量续签流程，优先处理红色已过期人员。',
+      '仅1人合同状态正常，批量续签涉及面广，需提前协调各部门。'
+    ]},
+    tne:{title:'司龄分析',color:'#FB7185',kpi:[
+      {v:'4.3年',l:'平均司龄'},{v:'4.2年',l:'司龄中位数'},{v:'35.5%',l:'5-10年占比'},{v:'10人',l:'1-3年群体'}
+    ],charts:[
+      {id:'mg17',lb:'司龄分布',fn:function(i){br(i,CD.tenure.l,CD.tenure.d,'人')}},
+      {id:'mg18',lb:'司龄离职率',fn:function(i){hb(i,CD.tentoto.l,CD.tentoto.d,'%')}},
+      {id:'mg19',lb:'司龄薪资对比',fn:function(i){hb(i,CD.saltenure.l,CD.saltenure.d,'元')}}
+    ],data:[
+      {id:'tenure_dist',lb:'司龄分布'},{id:'tenure_turnover',lb:'司龄离职率'},{id:'salary_by_tenure',lb:'司龄薪资'},{id:'salary_5num',lb:'薪资五数'}
+    ],analysis:[
+      '司龄分布呈「橄榄型」：1-3年（32.3%）和3-5年（29%）为中坚力量。',
+      '5-10年核心骨干占比35.5%，团队稳定性较强。',
+      '1-3年员工离职率30%偏高，需关注入职1-3年员工留存。',
+      '司龄与薪资正相关，5-10年均薪¥32k为最高段，激励效果明显。'
+    ]}
+  };
+  var p=pages[tab];if(!p)return;
+  // KPI section
+  var kpiHtml=p.kpi.map(function(k){return'<div class="mp-kpi-c"><div class="v">'+k.v+'</div><div class="l">'+k.l+'</div></div>'}).join('');
+  document.getElementById('mpKpi').innerHTML='<h3><div class="md" style="background:'+p.color+';box-shadow:0 0 6px '+p.color+'"></div>'+p.title+' — 核心指标</h3><div class="mp-kpi-g">'+kpiHtml+'</div>';
+  // Chart section
+  document.getElementById('mpChart').innerHTML='<h3>趋势图表</h3><div class="mp-chart-g" id="mpChartGrid"></div>';
+  var cg=document.getElementById('mpChartGrid');cg.innerHTML='';
+  p.charts.forEach(function(c,i){
+    var w=document.createElement('div');
+    w.innerHTML='<div class="ci-l">'+c.lb+'</div><div class="cw"><canvas id="'+c.id+'"></canvas></div>';
+    cg.appendChild(w);
+    setTimeout(function(){c.fn(c.id)},100+i*50);
+  });
+  // Data section
+  var dataHtml=p.data.map(function(d){
+    var b=BL[d.id];if(!b)b='<div style="color:var(--text4);font-size:12px">暂无数据</div>';
+    return '<div class="dc"><div class="dc-t">'+d.lb+'</div>'+b+'</div>';
+  }).join('');
+  document.getElementById('mpData').innerHTML='<h3>明细数据</h3><div class="mp-data-g">'+dataHtml+'</div>';
+  // Analysis section
+  var anaHtml=p.analysis.map(function(a){return'<li>'+a+'</li>'}).join('');
+  document.getElementById('mpAnalysis').innerHTML='<h3>详细解读</h3><div class="mp-analysis"><ul>'+anaHtml+'</ul></div>';
+}
+
+function switchChartTab(el){
+  document.querySelectorAll('.chart-tabs .ctab').forEach(function(t){t.classList.remove('active')});
+  el.classList.add('active');
+  chartTab=el.textContent.trim()==='人员'?'ppl':el.textContent.trim()==='薪酬'?'sal':el.textContent.trim()==='流动'?'flow':'perf';
+  buildCharts();
+}
+
+function toggleDrawer(){
+  var d=document.getElementById('drawer'),ov=document.getElementById('dov'),m=document.getElementById('main');
+  if(d.classList.contains('open')){d.classList.remove('open');ov.classList.remove('open');m.classList.remove('dopen')}
+  else{d.classList.add('open');ov.classList.add('open');m.classList.add('dopen')}
+}
+
+function toggleSidebar(){
+  var s=document.getElementById('sidebar'),m=document.getElementById('main');
+  s.classList.toggle('collapsed');
+  if(s.classList.contains('collapsed')){m.style.marginLeft='52px'}else{m.style.marginLeft=''}
+}
+
+function toggleDetail(){
+  var d=document.getElementById('detailSection'),b=document.getElementById('expandBtn');
+  if(!d)return;
+  var isOpen=d.style.display!=='none';
+  d.style.display=isOpen?'none':'block';
+  b.textContent=isOpen?'📊 查看完整数据看板':'📌 收起详细数据';
+}
+
+function allIds(){var a=[];CAT.forEach(function(m){m.metrics.forEach(function(x){a.push(x.id)})});return a}
+
+function applyAndClose(){buildCharts();buildAcc();toggleDrawer()}
+
+function clearAll(){sel.clear();document.querySelectorAll('.dr-mitem input').forEach(function(c){c.checked=false});updateCount()}
+
+function updateCount(){
+  document.getElementById('selCount').textContent=sel.size;
+  CAT.forEach(function(mod,i){
+    var cnt=mod.metrics.filter(function(m){return sel.has(m.id)}).length;
+    var el=document.querySelectorAll('.dr-mc')[i];
+    if(el)el.textContent=cnt+'/'+mod.metrics.length;
+  });
+}
+
+function applyPreset(pr,btn){
+  document.querySelectorAll('.dr-pbtn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');sel.clear();
+  var ids=pr.ids==='__ALL__'?allIds():pr.ids;
+  ids.forEach(function(id){sel.add(id)});
+  document.querySelectorAll('.dr-mitem input').forEach(function(cb){cb.checked=sel.has(cb.dataset.id)});
+  updateCount();
+}
+
+function renderDrawerContent(){
+  document.getElementById('drPresets').innerHTML=PRESETS.map(function(p){
+    return '<button class="dr-pbtn'+(p.id==='full'?' active':'')+'" onclick="applyPreset(PRESETS.find(function(x){return x.id===\''+p.id+'\'}),this)">'+p.label+'</button>';
+  }).join('');
+  var html='';
+  CAT.forEach(function(mod){
+    html+='<div class="dr-m"><div class="dr-mh" onclick="var g=this.parentElement.querySelector(\'.dr-mi\');if(g)g.style.display=g.style.display===\'none\'?\'\':\'none\'"><div class="dr-md" style="background:'+mod.color+';color:'+mod.color+'"></div><div class="dr-ml">'+mod.label+'</div><div class="dr-mc">'+mod.metrics.length+'/'+mod.metrics.length+'</div></div><div class="dr-mi">'+
+    mod.metrics.map(function(m){return '<label class="dr-mitem"><input type="checkbox" data-id="'+m.id+'" checked onchange="if(this.checked)sel.add(this.dataset.id);else sel.delete(this.dataset.id);updateCount()"><div><div class="dr-mlb">'+m.label+'</div><div class="dr-mn">'+m.note+'</div></div></label>'}).join('')+'</div></div>';
+  });
+  document.getElementById('drBody').innerHTML=html;
+}
+
+function copyData(){
+  if(navigator.clipboard){navigator.clipboard.writeText('HR全景看板 琥珀晨曦 v5.1').then(function(){alert('已复制')})}
+}
+
+function generateHighlights(){
+  var grid=document.getElementById('hlGrid');if(!grid)return;
+  var items=[];
+  // New hire turnover
+  var nht=CD.newHireTurnover||0;
+  if(nht===0)items.push({num:'0.0%',cls:'',label:'新员工离职率',desc:'新人融入做得很好，继续保持'});
+  // Net change
+  var nc=1;
+  if(nc>0)items.push({num:'+'+nc,cls:'',label:'本月净增减',desc:'团队规模稳步增长中'});
+  else if(nc<0)items.push({num:nc,cls:'',label:'本月净增减',desc:'团队在调整期，稳住心态'});
+  // High perf rate
+  var hpr=50.0;
+  if(hpr>=40)items.push({num:hpr+'%',cls:'',label:'高绩效占比',desc:'A+B+级人才充足，团队战斗力强'});
+  else if(hpr>=25)items.push({num:hpr+'%',cls:'',label:'高绩效占比',desc:'有提升空间，持续关注'});
+  // Perf coverage
+  var pcr=90.3;
+  if(pcr>=85)items.push({num:pcr+'%',cls:'',label:'绩效覆盖率',desc:'大部分伙伴已完成评估，过程规范'});
+  // Tenure stability
+  var t5=35.5;
+  if(t5>=30)items.push({num:t5+'%',cls:'',label:'5年以上稳定员工',desc:'核心骨干留存率高，团队根基扎实'});
+  // Gender gap
+  var gg=4.9;
+  if(gg<=5)items.push({num:gg+'%',cls:'',label:'性别薪酬差异',desc:'差异在健康范围内，薪酬公平性良好'});
+  // Bonus coverage
+  var bc=100;
+  if(bc===100)items.push({num:'100%',cls:'',label:'奖金覆盖率',desc:'全员享受奖金激励，士气有保障'});
+  // Limit to 6 items
+  items=items.slice(0,6);
+  grid.innerHTML=items.map(function(it){
+    return '<div class="hl-item"><div class="hl-num'+(it.cls?' '+it.cls:'')+'">'+it.num+'</div><div class="hl-label">'+it.label+'</div><div class="hl-desc">'+it.desc+'</div></div>';
+  }).join('');
+  // Summary: auto-generate a worth affirmation
+  var totalHighlights=items.length;
+  var messages=[
+    '本月团队整体状态不错，你在人才保留和文化建设上的努力正在见效 💚',
+    '数据说明你的团队管理做得很好，继续保持这样的节奏 🌿',
+    '团队的稳定性和绩效表现都让人安心，你的付出看得见 ✨',
+    '新员工流失率为零，说明你在入职引导上花的心思没有白费 👏',
+    '这个月的人员数据整体健康，你可以更从容地关注长期发展 🌱'
+  ];
+  var msg=messages[Math.min(totalHighlights,messages.length-1)];
+  document.getElementById('hlSummary').innerHTML='<strong>HR价值提炼：</strong>'+msg;
+}
+
+renderDrawerContent();buildCharts();buildAcc();generateHighlights();
+
+</script>
+</body>
+</html>
